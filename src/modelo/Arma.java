@@ -1,62 +1,74 @@
 package modelo;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Random;
 
 public class Arma {
-    private String tipo;
-    private int capacidade;
-    private int municao;
-    private ArrayList<Boolean> tambor;
-    private int posicaoAtualTambor;
-    private int dano;
+    private ArrayList<Boolean> ammo; // lista de shells da escopeta
+    private int dano;    // dano aplicado ao alvo
+    private int serrada; // se serrada dano 2x
 
-    public Arma(String tipo, int capacidade, ArrayList<Boolean> tambor) {
-        this.tipo = tipo;
-        this.capacidade = capacidade;
-        this.municao = 0;
-        this.tambor = new ArrayList<>(this.capacidade);
-        this.posicaoAtualTambor = 0;
+    private int nReal;
+    private int nFake;
+
+    // ##### CONSTRUCTOR ##### \\
+    public Arma() {
+        this.ammo = new ArrayList<>(9);
         this.dano = 1;
+        this.serrada = 0;
+
+        this.nReal = 0;
+        this.nFake = 0;
     }
 
-    public void definirMunicao() {
-        int min = 2;
-        int max = this.capacidade;
+    // ##### FUNÇÕES ##### \\
 
-        this.municao = (int) (Math.random() * (max - min + 1) + min);
+    public boolean taVazia() { // keep track da munição
+        return this.ammo.isEmpty();
     }
 
-    public void definirTambor() {
-        ArrayList<Integer> indices = new ArrayList<>(capacidade);
+    public void carregar() { // adiciona a munição na arma
+        Random rdm = new Random(); // import random (local, só usa aqui)
 
-        for (int i = 0; i < capacidade; i++) {
-            indices.add(i, i);
-        }
 
-        Collections.shuffle(indices);
+        // loop, adiciona 3 a 9 balas, aleatória entre cheias e vazias (true e false)
+        // DISCLAIMER: implementar impedir todas cheias ou vazias
 
-        for (int i = 0; i < this.municao; i++) {
-            int indiceRandom = indices.get(i);
-            this.tambor.set(indiceRandom, true);
+        while (this.nReal == 0 || this.nFake == 0) {
+            this.nReal = 0;
+            this.nFake = 0;
+            this.ammo.clear(); // limpa as balas antigas (se tiver)
+
+            for (int i = 0; i <= rdm.nextInt(2, 9); i++) {
+                this.ammo.add(rdm.nextBoolean());
+
+                if (this.ammo.get(i)) {
+                    this.nReal += 1;
+                } else {
+                    this.nFake += 1;
+                }
+            }
         }
     }
 
-    public void recarregar() {
-        this.definirMunicao();
-        this.definirTambor();
-    }
-
-    public void atirar(Player player) {
-        if (this.tambor.get(this.posicaoAtualTambor)) {
-            player.levarDano(this.dano);
+    public boolean atirar(Player alvo) { // keep track da bala + aplique do dano
+        if (taVazia()) { // se arma estiver vazia
+            System.out.println("CLICK... Arma vazia");
+            return false; // não houve dano
         }
 
-        this.dano = 1;
-        this.posicaoAtualTambor++;
+        // armazena o tipo da bala engatilhada
+        boolean balaAtual = this.ammo.getFirst();
 
-        if (posicaoAtualTambor >= capacidade) {
-            this.recarregar();
+        if (balaAtual) { // bala real
+            alvo.levarDano(this.dano + this.serrada);
+            System.out.println("BAAAANG");
+        } else { // bala falsa
+            System.out.println("capsula VAZIA!");
         }
+
+        this.ammo.removeFirst(); // remova a bala
+
+        return balaAtual; // retorna a bala
     }
 }

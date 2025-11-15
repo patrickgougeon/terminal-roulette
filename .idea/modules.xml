@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/buckshot-roulette-terminal.iml" filepath="$PROJECT_DIR$/buckshot-roulette-terminal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/joguinho.iml" filepath="$PROJECT_DIR$/joguinho.iml" />
     </modules>
   </component>
 </project>

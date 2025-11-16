@@ -6,7 +6,7 @@ Neste jogo, dois jogadores se enfrentam em um teste de probabilidade, gerenciame
 
 ---
 
-## 룰 Como Jogar: As Regras
+## Como Jogar: As Regras
 
 ### 1. O Sistema de Saúde e Cargas (A Regra Principal)
 

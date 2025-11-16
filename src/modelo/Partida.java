@@ -14,7 +14,7 @@ public class Partida extends UI {
     }
 
     public void iniciar() throws InterruptedException {
-        System.out.println("### BEM-VINDO AO JOGO COMPLETO ###");
+        msg_iniciar();
 
         // Loop principal do JOGO: continua enquanto ambos tiverem VIDA
         while (p1.getVida() > 0 && p2.getVida() > 0) {

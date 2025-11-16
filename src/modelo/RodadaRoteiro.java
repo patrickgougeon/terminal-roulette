@@ -1,175 +1,141 @@
+// Em RodadaRoteiro.java
 package modelo;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class RodadaRoteiro extends UI{
+public class RodadaRoteiro extends UI {
     private Player p1;
     private Player p2;
-    private Player jogadorAtual; // jogador atual no round
+    private Player jogadorAtual;
 
-    private Dealer dealer;
+    // private Dealer dealer; // REMOVIDO (será local)
     private Arma escopeta;
 
-    private Scanner scanner;
+    // private Scanner scanner; // REMOVIDO
 
     // ##### CONSTRUCTOR ##### \\
-    public RodadaRoteiro(Player p1, Player p2, Scanner scan) {
+    public RodadaRoteiro(Player p1, Player p2) { // Scanner removido
         this.p1 = p1;
         this.p2 = p2;
         this.jogadorAtual = p1; // P1 começa
 
-        this.dealer = new Dealer();
+        // this.dealer = new Dealer(); // REMOVIDO
         this.escopeta = new Arma();
 
-        this.scanner = scan;
+        // this.scanner = scan; // REMOVIDO
     }
 
-    public Player iniciar() throws InterruptedException { // inicia a rodada e mantem o loop de gameplay
+    /**
+     * Esta é a "execução reta" (script) da rodada.
+     * Ela não usa loops de input e testa todas as funcionalidades.
+     */
+    public Player iniciar() throws InterruptedException {
         p1.regenerarSaude();
         p2.regenerarSaude();
-        while (p1.getSaude() > 0 && p2.getSaude() > 0) {
 
-            Mochila mochilaP1 = p1.getMochila();
-            Mochila mochilaP2 = p2.getMochila();
+        // Vamos criar um Dealer local apenas para carregar o roteiro
+        Dealer dealerRoteiro = new Dealer();
 
-            // carrega a arma no início da rodada
-            if (escopeta.taVazia()) {
-                dealer.prepararNovaRodada(escopeta, mochilaP1, mochilaP2);
-            };
+        // carrega a arma e itens de forma scriptada
+        dealerRoteiro.prepararRodadaRoteiro(escopeta, p1.getMochila(), p2.getMochila());
 
-            // entrega arma para o jogador atual
-            jogadorAtual.receberArma(escopeta);
-            escopeta.defDono(jogadorAtual);
+        // Variáveis para o script
+        Player rival;
+        boolean foiBalaReal;
 
-            // Loop do turno (enquanto o jogador tiver a arma)
-            executarTurno();
-        }
+        System.out.println("\n--- INÍCIO DO ROTEIRO DA RODADA ---");
 
-        System.out.println("FIM DE JOGO!"); // se saiu do loop, o jogo acabou
+        // --- TURNO 1 (Jogador 1) ---
+        // Carga: [F, R, F, R] | P1 Itens: [Lupa, Cigarro]
+        System.out.println("\n--- Turno de Jogador 1 (Roteiro) ---");
+        jogadorAtual = p1;
+        rival = p2;
+        jogadorAtual.receberArma(escopeta);
+        escopeta.defDono(jogadorAtual);
 
-        if (p1.getSaude() <= 0) {
-            System.out.println("Jogador 1 foi derrotado (sem saúde).");
-            return p1;
-        } else {
-            System.out.println("Jogador 2 foi derrotado (sem saúde).");
-            return p2;
-        }
-    }
+        System.out.println("[SCRIPT] Ação: P1 usa Item [Lupa] (índice 0)");
+        jogadorAtual.usarItemDaMochila(0); // P1 usa Lupa
+        // (A Lupa vai imprimir "Câmara vazia.")
 
-    private int lerEntradaInteira() {
-        while (true) { // Loop infinito até receber uma entrada válida
-            String entrada = scanner.nextLine();
+        System.out.println("[SCRIPT] Ação: P1 atira em SI (esperando Falsa)");
+        foiBalaReal = jogadorAtual.mirar(jogadorAtual); // Bala 1 (Falsa)
+        System.out.println("Bala era real? " + foiBalaReal + " (Esperado: false)");
 
-            try {
-                // Tenta converter o texto para um número inteiro
-                int numero = Integer.parseInt(entrada);
-                return numero; // Sucesso! Retorna o número.
+        // Como a bala foi falsa, P1 joga de novo
+        System.out.println("[SCRIPT] P1 joga de novo.");
+        // Carga: [R, F, R]
 
-            } catch (NumberFormatException e) {
-                System.out.println(Cor.VERM.pin("Erro: Por favor, digite um número válido."));
-                System.out.print("Tente novamente: ");
-            }
-        }
-    }
+        System.out.println("[SCRIPT] Ação: P1 atira no RIVAL (esperando Real)");
+        foiBalaReal = jogadorAtual.mirar(rival); // Bala 2 (Real)
+        System.out.println("Bala era real? " + foiBalaReal + " (Esperado: true)");
+        System.out.println("Saúde P2: " + rival.getSaude() + " (Esperado: 2)");
 
-    private void executarTurno() throws InterruptedException { // turno do player atual
-        // Define quem é o rival
-        Player rival = (jogadorAtual == p1) ? p2 : p1;
-        /*             |      TERNARY  OPERATOR      |
-                                se atual == p1
-                                    rival = p2
-                                senão
-                                    rival = p1
-         */
-        String nome = (jogadorAtual == p1) ? "Jogador 1" : "Jogador 2"; // mesma logica acima
-
-        System.out.println("--- Turno de " + nome + " ---");
-
-        while (true) {
-
-            if (escopeta.taVazia()) { // se munição vazia
-                msg_reload();
-                break; // sai do loop do turno
-            };
-
-            System.out.println("Sua saúde: " + Cor.VERM.pin(Integer.toString(jogadorAtual.getSaude())));
-            System.out.println("[ 1 ] Atirar em si \n[ 2 ] Atirar no rival " +
-                    "\n[ 3 ] Usar item\n[ 4 ] mostrar conquistas");
-
-            int op = lerEntradaInteira();
-            //scanner.nextLine();
-
-            boolean foiBalaReal;
-
-            boolean turnoAcabou = false; // Flag para controlar o fim do turno
-
-            switch (op) {
-                case 1 -> { // atirar em si
-                    msg_mirando();
-                    foiBalaReal = jogadorAtual.mirar(jogadorAtual);
-
-
-                    if (foiBalaReal) { // atirou em si e era real
-                        trocarTurno(); // passa a vez
-                        turnoAcabou = true; // Acaba o turno
-                    }else {
-                        System.out.println("JOGUE NOVAMENTE");
-                    }
-                }
-                case 2 -> { // atirar no rival
-                    msg_mirando();
-                    jogadorAtual.mirar(rival);
-
-                    trocarTurno(); // passa a vez
-                    turnoAcabou = true; // Acaba o turno
-                }
-                case 3 -> {
-                    Mochila mochila = jogadorAtual.getMochila();
-                    mochila.mostrarItems();
-
-                    System.out.print("Qual item? (ou 0 para voltar): ");
-                    int opItens = lerEntradaInteira();
-
-                    if (opItens == 0) {
-                        // O usuário quer voltar, não faz nada e deixa o loop continuar
-                        System.out.println("Voltando...");
-
-                    } else if (opItens > 0 && opItens <= mochila.getQuantidadeItens()) {
-                        // O usuário digitou um número de item válido (Ex: 1 ou 2)
-                        // Traduz o índice: (usuário digitou 1 -> índice é 0)
-                        jogadorAtual.usarItemDaMochila(opItens - 1);
-
-                    } else {
-                        // O usuário digitou um número inválido (Ex: 5)
-                        System.out.println("Opção de item inválida.");
-                    }
-                    // turnoAcabou continua 'false', o loop 'while' continua
-                }
-                case 4 -> {
-                    jogadorAtual.mostrarConquistas();
-                }
-                default -> System.out.println("Opção inválida.");
-            }
-
-            if (turnoAcabou) {
-                break; // Sai do loop 'while(true)' e encerra o turno
-            }
-        }
-    }
-
-    private void trocarTurno() {
         System.out.println("Passando o turno...");
+        jogadorAtual.soltarArma();
 
-        /*  solta a arma na mesa, que é passada pro
-            inimigo pelo loop da função iniciar() */
-        this.jogadorAtual.soltarArma();
 
-        // alteração do jogador atual
-        if (this.jogadorAtual == p1) {
-            this.jogadorAtual = p2;
-        } else {
-            this.jogadorAtual = p1;
+        // --- TURNO 2 (Jogador 2) ---
+        // Carga: [F, R] | P2 Itens: [Serra]
+        System.out.println("\n--- Turno de Jogador 2 (Roteiro) ---");
+        jogadorAtual = p2;
+        rival = p1;
+        jogadorAtual.receberArma(escopeta);
+        escopeta.defDono(jogadorAtual);
+
+        System.out.println("[SCRIPT] Ação: P2 usa Item [Serra] (índice 0)");
+        jogadorAtual.usarItemDaMochila(0); // P2 usa Serra
+        // (Serra vai ativar e o dano da arma agora é 2)
+
+        System.out.println("[SCRIPT] Ação: P2 atira no RIVAL (esperando Falsa)");
+        foiBalaReal = jogadorAtual.mirar(rival); // Bala 3 (Falsa)
+        System.out.println("Bala era real? " + foiBalaReal + " (Esperado: false)");
+
+        System.out.println("Passando o turno...");
+        jogadorAtual.soltarArma();
+
+
+        // --- TURNO 3 (Jogador 1) ---
+        // Carga: [R] | P1 Itens: [Cigarro]
+        System.out.println("\n--- Turno de Jogador 1 (Roteiro) ---");
+        jogadorAtual = p1;
+        rival = p2;
+        jogadorAtual.receberArma(escopeta);
+        escopeta.defDono(jogadorAtual);
+
+        System.out.println("[SCRIPT] Ação: P1 usa Item [Cigarro] (deve falhar, saúde cheia)");
+        jogadorAtual.usarItemDaMochila(0); // P1 usa Cigarro (índice 0, Lupa já foi)
+
+        System.out.println("[SCRIPT] Ação: P1 mostra Conquistas (Teste Req. 3)");
+        jogadorAtual.mostrarConquistas();; // Testando o requisito de ordenação
+
+        System.out.println("[SCRIPT] Ação: P1 atira em SI (esperando Real)");
+        foiBalaReal = jogadorAtual.mirar(jogadorAtual); // Bala 4 (Real)
+        System.out.println("Bala era real? " + foiBalaReal + " (Esperado: true)");
+        // Dano é 1 (P2 usou serra, mas P1 não)
+        System.out.println("Saúde P1: " + jogadorAtual.getSaude() + " (Esperado: 2)");
+
+        System.out.println("Passando o turno...");
+        jogadorAtual.soltarArma();
+
+        // --- TURNO 4 (Jogador 2) ---
+        // Carga: [] (Vazia)
+        System.out.println("\n--- Turno de Jogador 2 (Roteiro) ---");
+        jogadorAtual = p2;
+        rival = p1;
+        jogadorAtual.receberArma(escopeta);
+        escopeta.defDono(jogadorAtual);
+
+        System.out.println("[SCRIPT] Ação: P2 tenta atirar (Arma vazia)");
+        if (escopeta.taVazia()) {
+            msg_reload();
         }
+
+        System.out.println("\n--- FIM DO ROTEIRO DA RODADA ---");
+
+        System.out.println("[ROTEIRO] Forçando P1 como perdedor para testar o loop de vidas.");
+        return p1;
+
+
     }
 }

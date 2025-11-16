@@ -20,7 +20,7 @@ public class Dealer {
 
         System.out.println("Limpando a mesa para a próxima rodada...");
         for (Esvaziavel obj : coisasParaLimpar) {
-            obj.seEsvaziar(); // Polimorfismo!
+            obj.seEsvaziar();
         }
 
         int qtdItens = geradorAleatorio.nextInt(4) + 1;
@@ -29,6 +29,31 @@ public class Dealer {
 
         // Reabastece a arma
         reabastecerArma(arma);
+    }
+
+    public void prepararRodadaRoteiro(Arma arma, Mochila mochilaP1, Mochila mochilaP2) {
+
+        // 1. Limpa o estado anterior
+        Esvaziavel[] coisasParaLimpar = { arma, mochilaP1, mochilaP2 };
+        System.out.println("[ROTEIRO] Limpando a mesa para o roteiro...");
+        for (Esvaziavel obj : coisasParaLimpar) {
+            obj.seEsvaziar();
+        }
+
+        // 2. Carrega itens específicos (para testar o uso)
+        System.out.println("[ROTEIRO] Carregando itens do roteiro...");
+        mochilaP1.adicionarItem(criarItem(TipoItem.LUPA));
+        mochilaP1.adicionarItem(criarItem(TipoItem.CIGARRO));
+        mochilaP2.adicionarItem(criarItem(TipoItem.SERRA));
+
+        // 3. Carrega uma sequência de balas exata
+        System.out.println("[ROTEIRO] Carregando arma do roteiro...");
+        arma.adicionarBala(false); // 1ª bala: Falsa (para P1 atirar em si)
+        arma.adicionarBala(true);  // 2ª bala: Real (para P1 atirar no rival)
+        arma.adicionarBala(false); // 3ª bala: Falsa (para P2 atirar no rival)
+        arma.adicionarBala(true);  // 4ª bala: Real (para P1 atirar em si e tomar dano)
+
+        System.out.println("Carga da Arma: [FALSA, REAL, FALSA, REAL]");
     }
 
     public void reabastecerMochila(Mochila mochila, int qtdItens) {

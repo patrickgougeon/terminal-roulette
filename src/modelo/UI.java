@@ -21,8 +21,6 @@ public abstract class UI {
         System.out.println("ai que medooooooh");
         Thread.sleep(600);
 
-        System.out.println("Começar jogo? [S|N]");
-
     }
 
     public void msg_mirando() throws InterruptedException {

@@ -18,7 +18,7 @@ public class Dealer {
     public void prepararNovaRodada(Arma arma, Mochila mochilaP1, Mochila mochilaP2) {
         Esvaziavel[] coisasParaLimpar = { arma, mochilaP1, mochilaP2 };
 
-        System.out.println("Limpando a mesa para a próxima rodada...");
+        System.out.println("Limpando a mesa...");
         for (Esvaziavel obj : coisasParaLimpar) {
             obj.seEsvaziar();
         }

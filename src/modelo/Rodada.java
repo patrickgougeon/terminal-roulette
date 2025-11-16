@@ -1,5 +1,6 @@
 package modelo;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Rodada extends UI{
@@ -7,6 +8,7 @@ public class Rodada extends UI{
     private Player p2;
     private Player jogadorAtual; // jogador atual no round
 
+    private Dealer dealer;
     private Arma escopeta;
 
     private Scanner scanner;
@@ -17,6 +19,7 @@ public class Rodada extends UI{
         this.p2 = new Player();
         this.jogadorAtual = p1; // P1 começa
 
+        this.dealer = new Dealer();
         this.escopeta = new Arma();
 
         this.scanner = new Scanner(System.in);
@@ -27,8 +30,13 @@ public class Rodada extends UI{
              estiverem vivos, continua o jogo */
         while (p1.getSaude() > 0 && p2.getSaude() > 0) {
 
+            Mochila mochilaP1 = p1.getMochila();
+            Mochila mochilaP2 = p2.getMochila();
+
+            dealer.reabastecerItensDoJogo(mochilaP1, mochilaP2);
+
             // carrega a arma no início da rodada
-            if (escopeta.taVazia()) {escopeta.carregar();};
+            if (escopeta.taVazia()) {dealer.reabastecerArma(escopeta);};
 
             // entrega arma para o jogador atual
             jogadorAtual.receberArma(escopeta);
@@ -61,29 +69,38 @@ public class Rodada extends UI{
             };
 
             System.out.println("Vida atual: " + jogadorAtual.getSaude());
-            System.out.println("[ 1 ] Atirar em si \n[ 2 ] Atirar no rival");
+            System.out.println("[ 1 ] Atirar em si \n[ 2 ] Atirar no rival \n[ 3 ] Usar item");
 
             int op = scanner.nextInt();
-            msg_mirando();
 
             boolean foiBalaReal;
 
-            if (op == 1) { // atirar em si
-                foiBalaReal = jogadorAtual.mirar(jogadorAtual);
+            switch (op) {
+                case 1 -> { // atirar em si
+                    msg_mirando();
+                    foiBalaReal = jogadorAtual.mirar(jogadorAtual);
 
-                if (foiBalaReal) { // atirou em si e era real
-                    System.out.println("Você levou dano!");
-                    trocarTurno(); // passa a vez
-                    break; // sai do loop do turno
-                } else {
-                    System.out.println("Era FAKE! Você joga de novo.");
-                    // Continua no loop
+                    if (foiBalaReal) { // atirou em si e era real
+                        System.out.println("Você levou dano!");
+                        trocarTurno(); // passa a vez
+                        break; // sai do loop do turno
+                    } else {
+                        System.out.println("Era FAKE! Você joga de novo.");
+                        // Continua no loop
+                    }
                 }
-
-            } else if (op == 2) { // atirar no rival
-                jogadorAtual.mirar(rival);
-                trocarTurno(); // passa a vez
-                break; // Sai do loop do turno
+                case 2 -> {
+                    msg_mirando();
+                    jogadorAtual.mirar(rival);
+                    trocarTurno(); // passa a vez
+                    break; // Sai do loop do turno
+                }
+                case 3 -> {
+                    Mochila mochila = jogadorAtual.getMochila();
+                    mochila.mostrarItems();
+                    int opItens = scanner.nextInt();
+                    jogadorAtual.usarItemDaMochila(opItens);
+                }
             }
         }
     }

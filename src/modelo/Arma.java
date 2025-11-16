@@ -6,7 +6,7 @@ import java.util.Random;
 public class Arma {
     private ArrayList<Boolean> ammo; // lista de shells da escopeta
     private int dano;    // dano aplicado ao alvo
-    private int serrada; // se serrada dano 2x
+    private boolean estaSerrada; // se serrada dano 2x
 
     private int nReal;
     private int nFake;
@@ -15,7 +15,7 @@ public class Arma {
     public Arma() {
         this.ammo = new ArrayList<>(9);
         this.dano = 1;
-        this.serrada = 0;
+        this.estaSerrada = false;
 
         this.nReal = 0;
         this.nFake = 0;
@@ -23,32 +23,40 @@ public class Arma {
 
     // ##### FUNÇÕES ##### \\
 
+    public boolean possuiBala() {
+        return this.ammo.getFirst();
+    }
+
     public boolean taVazia() { // keep track da munição
         return this.ammo.isEmpty();
     }
 
-    public void carregar() { // adiciona a munição na arma
-        Random rdm = new Random(); // import random (local, só usa aqui)
+    public void seEsvaziar() {
+        this.ammo.clear();
+    }
 
+    public void adicionarBala(Boolean bala) {
+        this.ammo.add(bala);
+    }
 
-        // loop, adiciona 3 a 9 balas, aleatória entre cheias e vazias (true e false)
-        // DISCLAIMER: implementar impedir todas cheias ou vazias
-
-        while (this.nReal == 0 || this.nFake == 0) {
-            this.nReal = 0;
-            this.nFake = 0;
-            this.ammo.clear(); // limpa as balas antigas (se tiver)
-
-            for (int i = 0; i <= rdm.nextInt(2, 9); i++) {
-                this.ammo.add(rdm.nextBoolean());
-
-                if (this.ammo.get(i)) {
-                    this.nReal += 1;
-                } else {
-                    this.nFake += 1;
-                }
-            }
+    public boolean serSerrada() {
+        if (estaSerrada) {
+            System.out.println("Esta arma ja esta serrada!");
+            return false;
         }
+
+        this.estaSerrada = true;
+        System.out.println("Você serrou a arma, agora ela da o DOBRO do dano!");
+        return true;
+    }
+
+    public void darDano(Player alvo) {
+        if (serSerrada()) {
+            alvo.levarDano(this.dano*2);
+            return;
+        }
+
+        alvo.levarDano(this.dano);
     }
 
     public boolean atirar(Player alvo) { // keep track da bala + aplique do dano
@@ -60,14 +68,15 @@ public class Arma {
         // armazena o tipo da bala engatilhada
         boolean balaAtual = this.ammo.getFirst();
 
-        if (balaAtual) { // bala real
-            alvo.levarDano(this.dano + this.serrada);
+        if (!balaAtual) { // bala real
+            this.darDano(alvo);
             System.out.println("BAAAANG");
         } else { // bala falsa
             System.out.println("capsula VAZIA!");
         }
 
         this.ammo.removeFirst(); // remova a bala
+        this.estaSerrada = false;
 
         return balaAtual; // retorna a bala
     }

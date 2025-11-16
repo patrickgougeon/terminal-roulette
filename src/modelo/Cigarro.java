@@ -7,7 +7,7 @@ public class Cigarro extends Item {
     }
 
     public boolean ativar(Player player) {
-        if (player.saudeCheia()) {
+        if (!player.saudeCheia()) {
             player.regenerarSaude(1);
             System.out.println("Você acende o cigarro. Sua saúde aumenta em 1!");
             return true;

@@ -1,24 +1,17 @@
 package modelo;
 
 import java.util.ArrayList;
-import java.util.Random;
 
-public class Arma {
+public class Arma implements Esvaziavel{
     private ArrayList<Boolean> ammo; // lista de shells da escopeta
     private int dano;    // dano aplicado ao alvo
-    private boolean estaSerrada; // se serrada dano 2x
-
-    private int nReal;
-    private int nFake;
+    private boolean estaSerrada; // se serrada dano 2x;
 
     // ##### CONSTRUCTOR ##### \\
     public Arma() {
         this.ammo = new ArrayList<>(9);
         this.dano = 1;
         this.estaSerrada = false;
-
-        this.nReal = 0;
-        this.nFake = 0;
     }
 
     // ##### FUNÇÕES ##### \\
@@ -51,7 +44,7 @@ public class Arma {
     }
 
     public void darDano(Player alvo) {
-        if (serSerrada()) {
+        if (estaSerrada) {
             alvo.levarDano(this.dano*2);
             return;
         }
@@ -68,7 +61,7 @@ public class Arma {
         // armazena o tipo da bala engatilhada
         boolean balaAtual = this.ammo.getFirst();
 
-        if (!balaAtual) { // bala real
+        if (balaAtual) { // bala real
             this.darDano(alvo);
             System.out.println("BAAAANG");
         } else { // bala falsa

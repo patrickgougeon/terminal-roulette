@@ -2,7 +2,7 @@ package modelo;
 
 import java.util.ArrayList;
 
-public class Mochila {
+public class Mochila implements Esvaziavel {
     private final int capacidade = 4;
     private ArrayList<Item> itens;
 
@@ -34,11 +34,14 @@ public class Mochila {
 
         for (int i=0; i < itens.size(); i++) {
             Item itemAtual = pegarItem(i);
-            System.out.printf("[ %d ] %s", i, itemAtual.getTipo());
+            System.out.printf("[ %d ] %s \n", i+1, itemAtual.getTipo());
         }
 
         return true;
     }
 
     // ##### GET & SET ##### \\
+    public int getQuantidadeItens() {
+        return itens.size();
+    }
 }

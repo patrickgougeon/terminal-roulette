@@ -82,7 +82,7 @@ public class Rodada extends UI{
                     "\n[ 3 ] Usar item\n[ 4 ] mostrar conquistas");
 
             int op = scanner.nextInt();
-            scanner.nextLine();
+            //scanner.nextLine();
 
             boolean foiBalaReal;
 

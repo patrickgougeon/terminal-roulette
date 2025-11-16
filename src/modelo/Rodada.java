@@ -57,6 +57,22 @@ public class Rodada extends UI{
         }
     }
 
+    private int lerEntradaInteira() {
+        while (true) { // Loop infinito até receber uma entrada válida
+            String entrada = scanner.nextLine();
+
+            try {
+                // Tenta converter o texto para um número inteiro
+                int numero = Integer.parseInt(entrada);
+                return numero; // Sucesso! Retorna o número.
+
+            } catch (NumberFormatException e) {
+                System.out.println(Cor.VERM.pin("Erro: Por favor, digite um número válido."));
+                System.out.print("Tente novamente: ");
+            }
+        }
+    }
+
     private void executarTurno() throws InterruptedException { // turno do player atual
         // Define quem é o rival
         Player rival = (jogadorAtual == p1) ? p2 : p1;
@@ -77,11 +93,11 @@ public class Rodada extends UI{
                 break; // sai do loop do turno
             };
 
-            System.out.println("Vida atual: " + Cor.VERM.pin(Integer.toString(jogadorAtual.getSaude())));
+            System.out.println("Sua saúde: " + Cor.VERM.pin(Integer.toString(jogadorAtual.getSaude())));
             System.out.println("[ 1 ] Atirar em si \n[ 2 ] Atirar no rival " +
                     "\n[ 3 ] Usar item\n[ 4 ] mostrar conquistas");
 
-            int op = scanner.nextInt();
+            int op = lerEntradaInteira();
             //scanner.nextLine();
 
             boolean foiBalaReal;
@@ -113,8 +129,7 @@ public class Rodada extends UI{
                     mochila.mostrarItems();
 
                     System.out.print("Qual item? (ou 0 para voltar): ");
-                    int opItens = scanner.nextInt();
-                    scanner.nextLine();
+                    int opItens = lerEntradaInteira();
 
                     if (opItens == 0) {
                         // O usuário quer voltar, não faz nada e deixa o loop continuar

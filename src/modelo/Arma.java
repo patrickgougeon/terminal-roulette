@@ -16,6 +16,9 @@ public class Arma extends UI implements Esvaziavel {
     }
 
     // ##### FUNÇÕES ##### \\
+    public void seEsvaziar() {
+        this.ammo.clear();
+    }
 
     public boolean possuiBala() {
         return this.ammo.getFirst();
@@ -23,10 +26,6 @@ public class Arma extends UI implements Esvaziavel {
 
     public boolean taVazia() { // keep track da munição
         return this.ammo.isEmpty();
-    }
-
-    public void seEsvaziar() {
-        this.ammo.clear();
     }
 
     public void defDono(Player novoDono) {this.dono = novoDono;}

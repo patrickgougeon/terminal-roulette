@@ -10,16 +10,16 @@ public class Mochila implements Esvaziavel {
         this.itens = new ArrayList<>(this.capacidade);
     }
 
+    public void seEsvaziar() {
+        itens.clear();
+    }
+
     public void adicionarItem(Item item) {
         itens.add(item);
     }
 
     public void removerItem(Item item) {
         itens.remove(item);
-    }
-
-    public void seEsvaziar() {
-        itens.clear();
     }
 
     public Item pegarItem(int index) {

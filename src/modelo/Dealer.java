@@ -66,5 +66,8 @@ public class Dealer {
                 }
             }
         }
+
+        System.out.printf("Número de balas reais: %d \n", nReal);
+        System.out.printf("Número de balas falsas: %d \n", nFake);
     }
 }

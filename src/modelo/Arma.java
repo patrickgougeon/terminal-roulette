@@ -2,10 +2,11 @@ package modelo;
 
 import java.util.ArrayList;
 
-public class Arma implements Esvaziavel{
+public class Arma extends UI implements Esvaziavel {
     private ArrayList<Boolean> ammo; // lista de shells da escopeta
     private int dano;    // dano aplicado ao alvo
     private boolean estaSerrada; // se serrada dano 2x;
+    private Player dono;
 
     // ##### CONSTRUCTOR ##### \\
     public Arma() {
@@ -27,6 +28,8 @@ public class Arma implements Esvaziavel{
     public void seEsvaziar() {
         this.ammo.clear();
     }
+
+    public void defDono(Player novoDono) {this.dono = novoDono;}
 
     public void adicionarBala(Boolean bala) {
         this.ammo.add(bala);
@@ -52,9 +55,9 @@ public class Arma implements Esvaziavel{
         alvo.levarDano(this.dano);
     }
 
-    public boolean atirar(Player alvo) { // keep track da bala + aplique do dano
+    public boolean atirar(Player alvo) throws InterruptedException { // keep track da bala + aplique do dano
         if (taVazia()) { // se arma estiver vazia
-            System.out.println("CLICK... Arma vazia");
+            msg_reload();
             return false; // não houve dano
         }
 
@@ -62,10 +65,10 @@ public class Arma implements Esvaziavel{
         boolean balaAtual = this.ammo.getFirst();
 
         if (balaAtual) { // bala real
+            msg_tiroReal();
             this.darDano(alvo);
-            System.out.println("BAAAANG");
-        } else { // bala falsa
-            System.out.println("capsula VAZIA!");
+        } else {
+            msg_tiroFake();
         }
 
         this.ammo.removeFirst(); // remova a bala

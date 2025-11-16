@@ -1,6 +1,7 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -76,18 +77,20 @@ public class Player{
         this.gun = a;
     }
 
+    public void perderVida() {this.vida -= 1;}
+
     public void soltarArma() { // arma do player vira null
         this.gun = null;
     }
 
-    public boolean mirar(Player alvo) { // chama função atirar da arma
+    public boolean mirar(Player alvo) throws InterruptedException{ // chama função atirar da arma
         return this.gun.atirar(alvo);
     }
 
     // ##### FUNÇÕES CONQUISTAS ##### \\
 
     public void desbloquearConquista(Conquista conquista) {
-        // O método .add() do Set retorna 'true' apenas se o item
+        // O metodo .add() do Set retorna 'true' apenas se o item
         // não estava presente e foi adicionado com sucesso.
         if (this.conquistas.add(conquista)) {
             System.out.println("\n--- CONQUISTA DESBLOQUEADA ---");
@@ -96,12 +99,30 @@ public class Player{
         }
     }
 
+    public void mostrarConquistas() {
+        if (this.conquistas.isEmpty()) {
+            System.out.println("Nenhuma conquista desbloqueada ainda.");
+            return;
+        }
+
+        System.out.println("\n--- MINHAS CONQUISTAS ---");
+
+        // Pega o Set, transforma em Stream, ordena e imprime
+        this.conquistas.stream()
+                .sorted(Comparator.comparing(Conquista::getNome)) // Ordena usando o NOME da conquista
+                .forEach(conq -> System.out.println("- " + conq.getNome()));
+
+        System.out.println("-------------------------------------\n");
+    }
+
     // ##### GET & SET ##### \\
     /* getters e setters (muitas vezes temporarios)*/
 
     public int getSaude() { // retorna saúde
         return saude;
     }
+
+    public int getVida() {return vida;}
 
     public Mochila getMochila() {
         return mochila;

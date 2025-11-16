@@ -14,20 +14,20 @@ public class Rodada extends UI{
     private Scanner scanner;
 
     // ##### CONSTRUCTOR ##### \\
-    public Rodada() {
-        this.p1 = new Player();
-        this.p2 = new Player();
+    public Rodada(Player p1, Player p2, Scanner scan) {
+        this.p1 = p1;
+        this.p2 = p2;
         this.jogadorAtual = p1; // P1 começa
 
         this.dealer = new Dealer();
         this.escopeta = new Arma();
 
-        this.scanner = new Scanner(System.in);
+        this.scanner = scan;
     }
 
-    public void iniciar() throws InterruptedException { // inicia a rodada e mantem o loop de gameplay
-        /*  Loop principal, enquanto os players
-             estiverem vivos, continua o jogo */
+    public Player iniciar() throws InterruptedException { // inicia a rodada e mantem o loop de gameplay
+        p1.regenerarSaude();
+        p2.regenerarSaude();
         while (p1.getSaude() > 0 && p2.getSaude() > 0) {
 
             Mochila mochilaP1 = p1.getMochila();
@@ -40,13 +40,21 @@ public class Rodada extends UI{
 
             // entrega arma para o jogador atual
             jogadorAtual.receberArma(escopeta);
+            escopeta.defDono(jogadorAtual);
 
             // Loop do turno (enquanto o jogador tiver a arma)
             executarTurno();
         }
 
         System.out.println("FIM DE JOGO!"); // se saiu do loop, o jogo acabou
-        scanner.close();
+
+        if (p1.getSaude() <= 0) {
+            System.out.println("Jogador 1 foi derrotado (sem saúde).");
+            return p1;
+        } else {
+            System.out.println("Jogador 2 foi derrotado (sem saúde).");
+            return p2;
+        }
     }
 
     private void executarTurno() throws InterruptedException { // turno do player atual
@@ -65,12 +73,13 @@ public class Rodada extends UI{
         while (true) {
 
             if (escopeta.taVazia()) { // se munição vazia
-                System.out.println("Arma vazia, recarregando...");
+                msg_reload();
                 break; // sai do loop do turno
             };
 
-            System.out.println("Vida atual: " + jogadorAtual.getSaude());
-            System.out.println("[ 1 ] Atirar em si \n[ 2 ] Atirar no rival \n[ 3 ] Usar item");
+            System.out.println("Vida atual: " + Cor.VERM.pin(Integer.toString(jogadorAtual.getSaude())));
+            System.out.println("[ 1 ] Atirar em si \n[ 2 ] Atirar no rival " +
+                    "\n[ 3 ] Usar item\n[ 4 ] mostrar conquistas");
 
             int op = scanner.nextInt();
             scanner.nextLine();
@@ -84,18 +93,18 @@ public class Rodada extends UI{
                     msg_mirando();
                     foiBalaReal = jogadorAtual.mirar(jogadorAtual);
 
+
                     if (foiBalaReal) { // atirou em si e era real
-                        System.out.println("Você levou dano!");
                         trocarTurno(); // passa a vez
                         turnoAcabou = true; // Acaba o turno
-                    } else {
-                        System.out.println("Era FAKE! Você joga de novo.");
-                        // turnoAcabou continua 'false', o loop 'while' continua
+                    }else {
+                        System.out.println("JOGUE NOVAMENTE");
                     }
                 }
                 case 2 -> { // atirar no rival
                     msg_mirando();
                     jogadorAtual.mirar(rival);
+
                     trocarTurno(); // passa a vez
                     turnoAcabou = true; // Acaba o turno
                 }
@@ -121,6 +130,9 @@ public class Rodada extends UI{
                         System.out.println("Opção de item inválida.");
                     }
                     // turnoAcabou continua 'false', o loop 'while' continua
+                }
+                case 4 -> {
+                    jogadorAtual.mostrarConquistas();
                 }
                 default -> System.out.println("Opção inválida.");
             }
